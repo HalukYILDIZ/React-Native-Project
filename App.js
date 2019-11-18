@@ -116,6 +116,7 @@ import * as React from 'react';
 import { Button, View, Text } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import Map from './Map';
 
 class HomeScreen extends React.Component {
   render() {
@@ -125,6 +126,10 @@ class HomeScreen extends React.Component {
         <Button
           title="Go to Details"
           onPress={() => this.props.navigation.navigate('Details')}
+        />
+        <Button
+          title="Go to Maps"
+          onPress={() => this.props.navigation.navigate('Maps')}
         />
       </View>
     );
@@ -145,6 +150,7 @@ const RootStack = createStackNavigator(
   {
     Home: HomeScreen,
     Details: DetailsScreen,
+    Maps: Map,
   },
   {
     initialRouteName: 'Home',
