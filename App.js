@@ -4,6 +4,7 @@ import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Map from './src/screens/Map';
 import GroundScreen from './src/screens/GroundScreen';
+import ColorScreen from './src/screens/ColorScreen';
 
 class HomeScreen extends React.Component {
   render() {
@@ -18,6 +19,10 @@ class HomeScreen extends React.Component {
           title="Go to Maps"
           onPress={() => this.props.navigation.navigate('Maps')}
         />
+        <Button
+          title="Go to Color"
+          onPress={() => this.props.navigation.navigate('ColorScreens')}
+        />
       </View>
     );
   }
@@ -28,6 +33,7 @@ const RootStack = createStackNavigator(
     Home: HomeScreen,
     Ground: GroundScreen,
     Maps: Map,
+    ColorScreens: ColorScreen,
   },
   {
     initialRouteName: 'Home',

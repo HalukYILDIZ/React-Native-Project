@@ -31,17 +31,13 @@ async function requestLocationPermission() {
 }
 
 export default class MapCustom extends Component {
+
   render() {
     return (
       <View style={styles.container}>
         <Button title="Show UserLocation" onPress={requestLocationPermission} />
         <Button title="Show UserLocation" onPress={requestLocationPermission} />
-        <View style={styles.container}>
-          <Button
-            title="Show UserLocation"
-            onPress={requestLocationPermission}
-          />
-        </View>
+        <Button title="Change Map" onPress={requestLocationPermission} />
         <MapView
           provider={PROVIDER_GOOGLE}
           followsUserLocation={true}
@@ -49,7 +45,7 @@ export default class MapCustom extends Component {
           showsCompass={true}
           showsScale={true}
           showsMyLocationButton={true}
-          mapType="satellite"
+          mapType="terrain"
           style={styles.mapStyle}
           initialRegion={{
             latitude: 39.8,
@@ -65,11 +61,11 @@ export default class MapCustom extends Component {
                   [38.72337,32.72728]//[37.0, 35.0],
                 ]}
               /> */}
-          <Overlay
+          {/* <Overlay
             tappable={true}
             image={require('../../assets/haritatrans.png')}
             bounds={[[40.995, 32.015], [36.995, 35.015]]}
-          />
+          /> */}
           <Overlay
             tappable={true}
             image={require('../../assets/03drtrans.png')}
