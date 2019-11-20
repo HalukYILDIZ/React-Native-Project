@@ -1,5 +1,19 @@
 import React from 'react';
-import {Button, View, Text, Image, StyleSheet, StatusBar} from 'react-native';
+import {
+  Container,
+  Header,
+  Title,
+  Content,
+  Footer,
+  FooterTab,
+  Button,
+  Left,
+  Right,
+  Body,
+  Icon,
+  Text,
+} from 'native-base';
+import {Image, StyleSheet} from 'react-native';
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -13,26 +27,31 @@ class HomeScreen extends React.Component {
   };
   render() {
     return (
-      <View>
-        <StatusBar animated={true} backgroundColor="#16a085" />
-        <Text>Ana Sayfa</Text>
-        {/* <Buttons
-          title="Go to Grounds"
-          onPress={() => this.props.navigation.navigate('Ground')}
-        />
-        <Button
-          title="Go to Maps"
-          onPress={() => this.props.navigation.navigate('Maps')}
-        />
-        <Button
-          title="Go to Color"
-          onPress={() => this.props.navigation.navigate('ColorScreens')}
-        /> */}
-        <Button
-          title="Drawer"
-          onPress={() => this.props.navigation.toggleDrawer()}
-        />
-      </View>
+      <Container>
+        <Header>
+          <Left>
+            <Button
+              transparent
+              onPress={() => this.props.navigation.toggleDrawer()}>
+              <Icon name="menu" />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Header</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content>
+          <Text>This is Content Section</Text>
+        </Content>
+        <Footer>
+          <FooterTab>
+            <Button full>
+              <Text>Footer</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </Container>
     );
   }
 }
