@@ -31,13 +31,20 @@ async function requestLocationPermission() {
 }
 
 export default class MapCustom extends Component {
-
+  constructor(props) {
+    super(props);
+    this.state = {
+      mapUrl: require('../../assets/03drtrans.png'),
+      lat: [40.97713, 31.36124],
+      long: [39.26183, 33.7874],
+    };
+  }
   render() {
     return (
       <View style={styles.container}>
         <Button title="Show UserLocation" onPress={requestLocationPermission} />
         <Button title="Show UserLocation" onPress={requestLocationPermission} />
-        <Button title="Change Map" onPress={requestLocationPermission} />
+
         <MapView
           provider={PROVIDER_GOOGLE}
           followsUserLocation={true}
@@ -55,7 +62,7 @@ export default class MapCustom extends Component {
           }}>
           {/* <Overlay
                 tappable={true}
-                image={require('./assets/4228.png')}
+                image={require('../../assets/4228.png')}
                 bounds={[
                  [40.64962,31.36530],// [41.0, 32.0],
                   [38.72337,32.72728]//[37.0, 35.0],
@@ -66,15 +73,45 @@ export default class MapCustom extends Component {
             image={require('../../assets/haritatrans.png')}
             bounds={[[40.995, 32.015], [36.995, 35.015]]}
           /> */}
-          <Overlay
+          {/* <Overlay
             tappable={true}
             image={require('../../assets/03drtrans.png')}
             bounds={[
-              [40.97713, 31.36124], // [41.0, 32.0],
-              [39.26183, 33.7874], //[37.0, 35.0],
+              [40.97713, 31.36124],
+              [39.26183, 33.7874],
             ]}
+          /> */}
+          {/* <Overlay
+            tappable={true}
+            image={require('../../assets/haritatrans.png')}
+            bounds={[[40.995, 32.015], [36.995, 35.015]]}
+          /> */}
+
+          <Overlay
+            image={this.state.mapUrl}
+            bounds={[this.state.lat, this.state.long]}
           />
         </MapView>
+        <Button
+          title="Change Map"
+          onPress={() =>
+            this.setState({
+              mapUrl: require('../../assets/03dr.png'),
+              lat: [40.97713, 31.36124],
+              long: [39.26183, 33.7874],
+            })
+          }
+        />
+        <Button
+          title="Change Map"
+          onPress={() =>
+            this.setState({
+              mapUrl: require('../../assets/03drtrans.png'),
+              lat: [40.97713, 31.36124],
+              long: [39.26183, 33.7874],
+            })
+          }
+        />
       </View>
     );
   }
@@ -107,6 +144,6 @@ const styles = StyleSheet.create({
   },
   mapStyle: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height - 60,
+    height: Dimensions.get('window').height - 100,
   },
 });
