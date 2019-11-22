@@ -25,12 +25,14 @@ import {
 var BUTTONS = [
   {text: '03DR SOLID', icon: 'american-football', iconColor: '#2c8ef4'},
   {text: '03DR TRANSPARENT', icon: 'analytics', iconColor: '#f42ced'},
-  {text: 'HATALI HARİTA 2', icon: 'aperture', iconColor: '#ea943b'},
+  {text: 'Anatolion Eagle,Trans', icon: 'aperture', iconColor: '#ea943b'},
+  {text: 'Anatolion EagleSolid', icon: 'aperture', iconColor: '#ea943b'},
+  {text: '4228', icon: 'aperture', iconColor: '#ea943b'},
   {text: 'Delete', icon: 'trash', iconColor: '#fa213b'},
   {text: 'Cancel', icon: 'close', iconColor: '#25de5b'},
 ];
-var DESTRUCTIVE_INDEX = 3;
-var CANCEL_INDEX = 4;
+var DESTRUCTIVE_INDEX = 5;
+var CANCEL_INDEX = 6;
 
 async function requestLocationPerrmission() {
   try {
@@ -56,13 +58,21 @@ async function requestLocationPerrmission() {
 }
 
 export default class MapCustom extends Component {
+  static navigationOptions = {
+    title: 'Maps',
+    drawerLabel: 'MapScreen',
+    drawerIcon: ({tintColor}) => (
+      <Image
+        source={require('../../assets/icon.png')}
+        style={[styles.icon, {tintColor: tintColor}]}
+      />
+    ),
+  };
   constructor(props) {
     super(props);
     this.state = {
-      mapUrl: require('../../assets/03drtrans.png'),
-      lat: [40.97713, 31.36124],
-      long: [39.26183, 33.7874],
-      mapName: '03DRSOLID',
+      mapName: 'No Map Choosen',
+      buttonINDEX: 5,
     };
   }
 
@@ -119,37 +129,41 @@ export default class MapCustom extends Component {
                 latitudeDelta: 1.5,
                 longitudeDelta: 1.5,
               }}>
-              {/* <Overlay
-                tappable={true}
-                image={require('../../assets/4228.png')}
-                bounds={[
-                 [40.64962,31.36530],// [41.0, 32.0],
-                  [38.72337,32.72728]//[37.0, 35.0],
-                ]}
-              /> */}
-              {/* <Overlay
-            tappable={true}
-            image={require('../../assets/haritatrans.png')}
-            bounds={[[40.995, 32.015], [36.995, 35.015]]}
-          /> */}
-              {/* <Overlay
-            tappable={true}
-            image={require('../../assets/03drtrans.png')}
-            bounds={[
-              [40.97713, 31.36124],
-              [39.26183, 33.7874],
-            ]}
-          /> */}
-              {/* <Overlay
-            tappable={true}
-            image={require('../../assets/haritatrans.png')}
-            bounds={[[40.995, 32.015], [36.995, 35.015]]}
-          /> */}
-
-              <Overlay
-                image={this.state.mapUrl}
-                bounds={[this.state.lat, this.state.long]}
-              />
+              {this.state.buttonINDEX === 4 && (
+                <Overlay
+                  tappable={true}
+                  image={require('../../assets/4228.png')}
+                  bounds={[[40.64962, 31.3653], [38.72337, 32.72728]]}
+                />
+              )}
+              {this.state.buttonINDEX === 2 && (
+                <Overlay
+                  tappable={true}
+                  image={require('../../assets/haritatrans.png')}
+                  bounds={[[40.995, 32.015], [36.995, 35.015]]}
+                />
+              )}
+              {this.state.buttonINDEX === 1 && (
+                <Overlay
+                  tappable={true}
+                  image={require('../../assets/03drtrans.png')}
+                  bounds={[[40.97713, 31.36124], [39.26183, 33.7874]]}
+                />
+              )}
+              {this.state.buttonINDEX === 0 && (
+                <Overlay
+                  tappable={true}
+                  image={require('../../assets/03dr.png')}
+                  bounds={[[40.97713, 31.36124], [39.26183, 33.7874]]}
+                />
+              )}
+              {this.state.buttonINDEX === 3 && (
+                <Overlay
+                  tappable={true}
+                  image={require('../../assets/Harita.png')}
+                  bounds={[[40.995, 32.015], [36.995, 35.015]]}
+                />
+              )}
             </MapView>
           </View>
         </Content>
@@ -169,26 +183,34 @@ export default class MapCustom extends Component {
                     this.setState({clicked: BUTTONS[buttonIndex]});
                     if (buttonIndex === 0) {
                       this.setState({
-                        mapUrl: require('../../assets/03dr.png'),
-                        lat: [40.97713, 31.36124],
-                        long: [39.26183, 33.7874],
-                        mapName: '03DRSOLID',
+                        buttonINDEX: 0,
+                        mapName: '03 DR SOLID',
                       });
                     } else if (buttonIndex === 1) {
                       this.setState({
-                        mapUrl: require('../../assets/03drtrans.png'),
-                        lat: [40.97713, 31.36124],
-                        long: [39.26183, 33.7874],
-                        mapName: '03DRTRANSPARENT',
+                        buttonINDEX: 1,
+                        mapName: '03 DR TRANS',
                       });
                     } else if (buttonIndex === 2) {
                       this.setState({
-                        mapUrl: require('../../assets/haritatrans.png'),
-                        lat: [40.995, 32.015],
-                        long: [36.995, 35.015],
-                        mapName: 'HATALI HARİTA',
+                        buttonINDEX: 2,
+                        mapName: 'Anatolian Eagle Trans',
                       });
                     } else if (buttonIndex === 3) {
+                      this.setState({
+                        buttonINDEX: 3,
+                        mapName: 'Anatolian Eagle Solid',
+                      });
+                    } else if (buttonIndex === 4) {
+                      this.setState({
+                        buttonINDEX: 4,
+                        mapName: '4228',
+                      });
+                    } else if (buttonIndex === 5) {
+                      this.setState({
+                        buttonINDEX: 5,
+                        mapName: 'No Map Choosen',
+                      });
                     }
                   },
                 )
@@ -232,5 +254,9 @@ const styles = StyleSheet.create({
   mapStyle: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
+  },
+  icon: {
+    width: 24,
+    height: 24,
   },
 });

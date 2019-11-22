@@ -17,6 +17,7 @@ import {Image, StyleSheet} from 'react-native';
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
+    title: 'Homes',
     drawerLabel: 'HomeScreen',
     drawerIcon: ({tintColor}) => (
       <Image
@@ -37,7 +38,7 @@ class HomeScreen extends React.Component {
             </Button>
           </Left>
           <Body>
-            <Title>Header</Title>
+            <Title>Home</Title>
           </Body>
           <Right />
         </Header>
