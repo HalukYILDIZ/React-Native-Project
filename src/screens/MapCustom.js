@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
 import {
   StyleSheet,
@@ -5,9 +6,7 @@ import {
   Dimensions,
   PermissionsAndroid,
   Image,
-  TouchableOpacity,
 } from 'react-native';
-import RunInfo from './components/RunInfo';
 
 import MapView, {PROVIDER_GOOGLE, Overlay, Polyline} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -26,10 +25,7 @@ import {
   ActionSheet,
 } from 'native-base';
 
-import haversine from 'haversine';
-
-const LATITUDE = 37.78825;
-const LONGITUDE = -122.4324;
+//import haversine from 'haversine';
 
 var BUTTONS = [
   {text: '03DR SOLID', icon: 'american-football', iconColor: '#2c8ef4'},
@@ -67,7 +63,6 @@ async function requestLocationPerrmission() {
   }
 }
 
-let id = 0;
 export default class MapCustom extends Component {
   static navigationOptions = {
     title: 'Maps',
@@ -148,24 +143,39 @@ export default class MapCustom extends Component {
       heading: 0,
       accuracy: 0,
       toggleHighLow: true,
-      lat: 0,
-      lng: 0,
+      toggleFollowUser: true,
+      lat: 39.8,
+      lng: 32.8,
     };
   }
   onStart = () => {
     this._interval = setInterval(() => {
       Geolocation.getCurrentPosition(
         position => {
+          if (
+            position.coords.latitude !== this.state.lat &&
+            this.state.toggleFollowUser
+          ) {
+            this.setState({
+              heading: Math.round(
+                (Math.atan2(
+                  position.coords.longitude - this.state.lng,
+                  position.coords.latitude - this.state.lat,
+                ) *
+                  180) /
+                  Math.PI,
+              ),
+            });
+          }
+          // else if (!this.state.toggleFollowUser) {
+          //   this.setState({heading: 0});
+          // }
+
           this.setState({
-            heading:
-              (Math.atan2(
-                position.coords.longitude - this.state.lng,
-                position.coords.latitude - this.state.lat,
-              ) *
-                180) /
-              Math.PI,
-          });
-          this.setState({
+            // heading: Math.round(Math.atan2(
+            //   ( position.coords.longitude - this.state.lng),
+            //   (position.coords.latitude - this.state.lat)
+            // ) * 180 /(Math.PI)),
             second: this.state.second + 1,
             altitude: Math.round(position.coords.altitude * 3.2808399),
             lat: position.coords.latitude,
@@ -177,18 +187,18 @@ export default class MapCustom extends Component {
               {coords: position.coords, key: this.state.second},
             ],
           });
-          this.map.setCamera({
+          this.map.animateCamera({
             center: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              //heading: position.coords.heading,
+              latitude: this.state.lat,
+              longitude: this.state.lng,
             },
+            heading: this.state.heading,
           });
         },
         null,
         {
           timeout: 20000,
-          maximumAge: 1000,
+          //maximumAge: 1000,
           enableHighAccuracy: this.state.toggleHighLow,
         },
       );
@@ -280,35 +290,50 @@ export default class MapCustom extends Component {
                 <Overlay
                   tappable={true}
                   image={require('../../assets/4228.png')}
-                  bounds={[[40.64962, 31.3653], [38.72337, 32.72728]]}
+                  bounds={[
+                    [40.64962, 31.3653],
+                    [38.72337, 32.72728],
+                  ]}
                 />
               )}
               {this.state.buttonINDEX === 2 && (
                 <Overlay
                   tappable={true}
                   image={require('../../assets/haritatrans.png')}
-                  bounds={[[40.995, 32.015], [36.995, 35.015]]}
+                  bounds={[
+                    [40.995, 32.015],
+                    [36.995, 35.015],
+                  ]}
                 />
               )}
               {this.state.buttonINDEX === 1 && (
                 <Overlay
                   tappable={true}
                   image={require('../../assets/03drtrans.png')}
-                  bounds={[[40.97713, 31.36124], [39.26183, 33.7874]]}
+                  bounds={[
+                    [40.97713, 31.36124],
+                    [39.26183, 33.7874],
+                  ]}
                 />
               )}
               {this.state.buttonINDEX === 0 && (
                 <Overlay
                   tappable={true}
                   image={require('../../assets/03dr.png')}
-                  bounds={[[40.97713, 31.36124], [39.26183, 33.7874]]}
+                  bounds={[
+                    [40.97713, 31.36124],
+                    [39.26183, 33.7874],
+                  ]}
                 />
               )}
               {this.state.buttonINDEX === 3 && (
                 <Overlay
                   tappable={true}
                   image={require('../../assets/Harita.png')}
-                  bounds={[[40.995, 32.015], [36.995, 35.015]]}
+                  bounds={[
+                    [40.995, 32.015],
+                    [36.995, 35.015],
+                  ]}
                 />
               )}
               <Polyline
@@ -337,14 +362,27 @@ export default class MapCustom extends Component {
             </Button>
             <Button
               onPress={() =>
-                this.setState({toggleHighLow: !this.state.toggleHighLow})
+                this.setState({
+                  toggleHighLow: !this.state.toggleHighLow,
+                })
               }>
               <Text>
                 {this.state.toggleHighLow ? 'Accuracy:True' : 'Accuracy:False'}
               </Text>
               <Text>{this.state.accuracy}</Text>
             </Button>
-            <Button onPress={() => console.log(this.state.markers)}>
+            <Button
+              onPress={() =>
+                this.setState({
+                  toggleFollowUser: !this.state.toggleFollowUser,
+                  heading: 0,
+                })
+              }>
+              <Text>
+                {this.state.toggleFollowUser
+                  ? 'FollowingUser'
+                  : 'NotFollowingUser'}
+              </Text>
               <Text>{this.state.lat}</Text>
               <Text>{this.state.lng}</Text>
             </Button>
@@ -356,13 +394,13 @@ export default class MapCustom extends Component {
               <Text>Start:{this.state.second}</Text>
             </Button>
             <Button onPress={() => this.onPause()}>
-              <Text>Pause</Text>
+              <Text>Pause{this.state.heading}</Text>
             </Button>
-            <Button onPress={() => this.animateCamera()}>
+            <Button onPress={() => this.onReset()}>
               <Text>Reset</Text>
             </Button>
           </FooterTab>
-        </Footer>    
+        </Footer>
         <Footer>
           <FooterTab>
             <Button
