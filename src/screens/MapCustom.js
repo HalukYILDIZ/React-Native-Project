@@ -167,9 +167,6 @@ export default class MapCustom extends Component {
               ),
             });
           }
-          // else if (!this.state.toggleFollowUser) {
-          //   this.setState({heading: 0});
-          // }
 
           this.setState({
             // heading: Math.round(Math.atan2(
@@ -187,13 +184,22 @@ export default class MapCustom extends Component {
               {coords: position.coords, key: this.state.second},
             ],
           });
-          this.map.animateCamera({
+          try {this.map.animateCamera({
             center: {
               latitude: this.state.lat,
               longitude: this.state.lng,
             },
             heading: this.state.heading,
-          });
+          });} catch (err) {
+            this.map.setCamera({
+              center: {
+                latitude: this.state.lat,
+                longitude: this.state.lng,
+              },
+              heading: this.state.heading,
+            });
+            console.warn(err);
+          }
         },
         null,
         {
@@ -394,7 +400,8 @@ export default class MapCustom extends Component {
               <Text>Start:{this.state.second}</Text>
             </Button>
             <Button onPress={() => this.onPause()}>
-              <Text>Pause{this.state.heading}</Text>
+              <Text>Pause</Text>
+              <Text>Heading: {this.state.heading}</Text>
             </Button>
             <Button onPress={() => this.onReset()}>
               <Text>Reset</Text>
