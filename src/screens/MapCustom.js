@@ -5,9 +5,12 @@ import {
   Dimensions,
   PermissionsAndroid,
   Image,
+  TouchableOpacity,
 } from 'react-native';
+import RunInfo from './components/RunInfo';
 
-import MapView, {PROVIDER_GOOGLE, Overlay} from 'react-native-maps';
+import MapView, {PROVIDER_GOOGLE, Overlay, Polyline} from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation';
 import {
   Container,
   Header,
@@ -22,6 +25,12 @@ import {
   Icon,
   ActionSheet,
 } from 'native-base';
+
+import haversine from 'haversine';
+
+const LATITUDE = 37.78825;
+const LONGITUDE = -122.4324;
+
 var BUTTONS = [
   {text: '03DR SOLID', icon: 'american-football', iconColor: '#2c8ef4'},
   {text: '03DR TRANSPARENT', icon: 'analytics', iconColor: '#f42ced'},
@@ -45,6 +54,7 @@ async function requestLocationPerrmission() {
     );
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       console.log('You can use the location');
+
       // eslint-disable-next-line no-alert
       alert('You can use the location');
     } else {
@@ -57,10 +67,11 @@ async function requestLocationPerrmission() {
   }
 }
 
+let id = 0;
 export default class MapCustom extends Component {
   static navigationOptions = {
     title: 'Maps',
-    drawerLabel: 'MapScreen',
+    drawerLabel: 'MapCustom',
     drawerIcon: ({tintColor}) => (
       <Image
         source={require('../../assets/icon.png')}
@@ -68,14 +79,137 @@ export default class MapCustom extends Component {
       />
     ),
   };
+  // async getCamera() {
+  //   const camera = await this.map.getCamera();
+  //   console.log(camera);
+  // }
+
+  // async setCamera() {
+  //   const camera = await this.map.getCamera();
+  //   // Note that we do not have to pass a full camera object to setCamera().
+  //   // Similar to setState(), we can pass only the properties you like to change.
+  //   this.map.setCamera({
+  //     // heading: camera.heading + 10,
+  //     center: {
+  //       latitude: this.state.lat,
+  //       longitude: this.state.lng,
+  //     },
+  //   });
+  // }
+
+  // async animateCamera() {
+  //   const camera = await this.map.getCamera();
+  //   camera.heading += 40;
+  //   camera.pitch += 10;
+  //   camera.altitude += 1000;
+  //   camera.zoom -= 1;
+  //   camera.center.latitude += 0.5;
+  //   this.map.animateCamera(camera, {duration: 2000});
+  // }
   constructor(props) {
     super(props);
+    // let watchID = Geolocation.watchPosition(position => {
+    //   let distance = 0;
+    //   if (this.state.previousCoordinate) {
+    //     distance =
+    //       this.state.distance +
+    //       haversine(this.state.previousCoordinate, position.coords, {
+    //         unit: 'meter',
+    //       });
+    //     this.distanceInfo.setState({value: distance});
+    //   }
+    //   this.speedInfo.setState({value: position.coords.speed});
+    //   this.directionInfo.setState({value: position.coords.heading});
+    //   this.setState(
+    //     {
+    //       markers: [
+    //         ...this.state.markers,
+    //         {
+    //           coordinate: position.coords,
+    //           key: id++,
+    //         },
+    //       ],
+    //       previousCoordinate: position.coords,
+    //       distance,
+    //     },
+    //     null,
+    //     {enableHighAccuracy: true, distanceFilter: 0},
+    //   );
+    // });
+
     this.state = {
       mapName: 'No Map Choosen',
       buttonINDEX: 5,
+      markers: [],
+      // watchID,
+      second: 0,
+      coordinatesInfo: [],
+      altitude: 0,
+      heading: 0,
+      accuracy: 0,
+      toggleHighLow: true,
+      lat: 0,
+      lng: 0,
     };
   }
+  onStart = () => {
+    this._interval = setInterval(() => {
+      Geolocation.getCurrentPosition(
+        position => {
+          this.setState({
+            heading:
+              (Math.atan2(
+                position.coords.longitude - this.state.lng,
+                position.coords.latitude - this.state.lat,
+              ) *
+                180) /
+              Math.PI,
+          });
+          this.setState({
+            second: this.state.second + 1,
+            altitude: Math.round(position.coords.altitude * 3.2808399),
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            // heading: position.coords.heading,
+            coordinatesInfo: [
+              ...this.state.coordinatesInfo,
+              {coords: position.coords, key: this.state.second},
+            ],
+          });
+          this.map.setCamera({
+            center: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              //heading: position.coords.heading,
+            },
+          });
+        },
+        null,
+        {
+          timeout: 20000,
+          maximumAge: 1000,
+          enableHighAccuracy: this.state.toggleHighLow,
+        },
+      );
+    }, 2000);
+  };
+  onPause = () => {
+    console.log(this.state.coordinatesInfo);
+    console.log('----------------------------------------------');
+    clearInterval(this._interval);
+  };
+  onReset = () => {
+    this.setState({
+      coordinatesInfo: [],
+      second: 0,
+    });
+    clearInterval(this._interval);
+  };
 
+  componentWillUnmount() {
+    Geolocation.clearWatch(this.state.watchID);
+  }
   render() {
     return (
       <Container>
@@ -116,8 +250,8 @@ export default class MapCustom extends Component {
 
             <MapView
               provider={PROVIDER_GOOGLE}
-              followsUserLocation={true}
               showsUserLocation={true}
+              followsUserLocation={true}
               showsCompass={true}
               showsScale={true}
               showsMyLocationButton={true}
@@ -128,6 +262,19 @@ export default class MapCustom extends Component {
                 longitude: 32.8,
                 latitudeDelta: 1.5,
                 longitudeDelta: 1.5,
+              }}
+              ref={ref => {
+                this.map = ref;
+              }}
+              initialCamera={{
+                center: {
+                  latitude: 39.8,
+                  longitude: 32.8,
+                },
+                pitch: 90,
+                heading: 360,
+                altitude: 1000,
+                zoom: 10,
               }}>
               {this.state.buttonINDEX === 4 && (
                 <Overlay
@@ -164,9 +311,58 @@ export default class MapCustom extends Component {
                   bounds={[[40.995, 32.015], [36.995, 35.015]]}
                 />
               )}
+              <Polyline
+                coordinates={this.state.coordinatesInfo.map(
+                  marker => marker.coords,
+                )}
+                strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+                strokeColors={[
+                  '#7F0000',
+                  '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+                  '#B24112',
+                  '#E5845C',
+                  '#238C23',
+                  '#7F0000',
+                ]}
+                strokeWidth={6}
+              />
             </MapView>
           </View>
         </Content>
+        <Footer>
+          <FooterTab>
+            <Button onPress={() => {}}>
+              <Text>altitude</Text>
+              <Text>{this.state.altitude} feet</Text>
+            </Button>
+            <Button
+              onPress={() =>
+                this.setState({toggleHighLow: !this.state.toggleHighLow})
+              }>
+              <Text>
+                {this.state.toggleHighLow ? 'Accuracy:True' : 'Accuracy:False'}
+              </Text>
+              <Text>{this.state.accuracy}</Text>
+            </Button>
+            <Button onPress={() => console.log(this.state.markers)}>
+              <Text>{this.state.lat}</Text>
+              <Text>{this.state.lng}</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+        <Footer>
+          <FooterTab>
+            <Button onPress={() => this.onStart()}>
+              <Text>Start:{this.state.second}</Text>
+            </Button>
+            <Button onPress={() => this.onPause()}>
+              <Text>Pause</Text>
+            </Button>
+            <Button onPress={() => this.animateCamera()}>
+              <Text>Reset</Text>
+            </Button>
+          </FooterTab>
+        </Footer>    
         <Footer>
           <FooterTab>
             <Button
@@ -258,5 +454,22 @@ const styles = StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
+  },
+  bubble: {
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  button: {
+    marginTop: 12,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'column',
+    marginVertical: 20,
+    backgroundColor: 'transparent',
   },
 });
